@@ -33,11 +33,15 @@ namespace Autofac.Integration.Web.Forms
     /// </summary>
     public abstract class DependencyInjectionModule : IHttpModule
     {
-        IContainerProviderAccessor _containerProviderAccessor;
         HttpApplication _httpApplication;
         IInjectionBehavior _noInjection = new NoInjection();
         IInjectionBehavior _propertyInjection = new PropertyInjection();
         IInjectionBehavior _unsetPropertyInjection = new UnsetPropertyInjection();
+
+        /// <summary>
+        /// Container provider accessor, set in inherited class if you don't want to use <see cref="T:System.Web.HttpApplication"/>.
+        /// </summary>
+        protected IContainerProviderAccessor ContainerProviderAccessor { get; set; }
 
         /// <summary>
         /// Disposes of the resources (other than memory) used by the module that implements <see cref="T:System.Web.IHttpModule"/>.
@@ -50,15 +54,16 @@ namespace Autofac.Integration.Web.Forms
         /// Initializes a module and prepares it to handle requests.
         /// </summary>
         /// <param name="context">An <see cref="T:System.Web.HttpApplication"/> that provides access to the methods, properties, and events common to all application objects within an ASP.NET application</param>
-        public void Init(HttpApplication context)
+        public virtual void Init(HttpApplication context)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
 
             _httpApplication = context;
-            _containerProviderAccessor = context as IContainerProviderAccessor;
 
-            if (_containerProviderAccessor == null)
+            if (ContainerProviderAccessor == null)
+                ContainerProviderAccessor = context as IContainerProviderAccessor;
+            if (ContainerProviderAccessor == null)
                 throw new InvalidOperationException(DependencyInjectionModuleResources.ApplicationMustImplementAccessor);
 
             context.PreRequestHandlerExecute += OnPreRequestHandlerExecute;
@@ -76,7 +81,7 @@ namespace Autofac.Integration.Web.Forms
             if (handler != null)
             {
                 var injectionBehavior = GetInjectionBehavior(handler);
-                var cp = _containerProviderAccessor.ContainerProvider;
+                var cp = ContainerProviderAccessor.ContainerProvider;
                 if (cp == null)
                     throw new InvalidOperationException(ContainerDisposalModuleResources.ContainerProviderNull);
                 injectionBehavior.InjectDependencies(cp.RequestLifetime, handler);
@@ -136,5 +141,3 @@ namespace Autofac.Integration.Web.Forms
         protected abstract IInjectionBehavior GetInjectionBehaviorForHandlerType(Type handlerType);
     }
 }
-
-
