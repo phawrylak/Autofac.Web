@@ -33,7 +33,10 @@ namespace Autofac.Integration.Web
     /// </summary>
     public class ContainerDisposalModule : IHttpModule
     {
-        IContainerProviderAccessor _containerProviderAccessor;
+        /// <summary>
+        /// Container provider accessor, set in inherited class if you don't want to use <see cref="T:System.Web.HttpApplication"/>.
+        /// </summary>
+        protected IContainerProviderAccessor ContainerProviderAccessor { get; set; }
 
         /// <summary>
         /// Disposes of the resources (other than memory) used by the module that implements <see cref="T:System.Web.IHttpModule"/>.
@@ -46,13 +49,14 @@ namespace Autofac.Integration.Web
         /// Initializes a module and prepares it to handle requests.
         /// </summary>
         /// <param name="context">An <see cref="T:System.Web.HttpApplication"/> that provides access to the methods, properties, and events common to all application objects within an ASP.NET application</param>
-        public void Init(HttpApplication context)
+        public virtual void Init(HttpApplication context)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
 
-            _containerProviderAccessor = context as IContainerProviderAccessor;
-            if (_containerProviderAccessor == null)
+            if (ContainerProviderAccessor == null)
+                ContainerProviderAccessor = context as IContainerProviderAccessor;
+            if (ContainerProviderAccessor == null)
                 throw new InvalidOperationException(ContainerDisposalModuleResources.ApplicationMustImplementAccessor);
 
             context.EndRequest += OnEndRequest;
@@ -65,7 +69,7 @@ namespace Autofac.Integration.Web
         /// <param name="e"></param>
         void OnEndRequest(object sender, EventArgs e)
         {
-            var cp = _containerProviderAccessor.ContainerProvider;
+            var cp = ContainerProviderAccessor.ContainerProvider;
             if (cp == null)
                 throw new InvalidOperationException(ContainerDisposalModuleResources.ContainerProviderNull);
             cp.EndRequestLifetime();
