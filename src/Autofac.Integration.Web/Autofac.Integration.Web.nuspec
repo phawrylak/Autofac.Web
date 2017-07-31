@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Autofac.Web</id>
+    <id>Autofac.Web-ContainerProviderAccessorOverride</id>
     <version>$version$</version>
     <authors>Autofac Contributors</authors>
     <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>ASP.NET web forms integration for Autofac.</description>
+    <description>ASP.NET web forms integration for Autofac. Allows to override container provider accessor in inherited HTTP modules. Useful when Global.asax cannot be used (e.g. in SharePoint farm solutions).</description>
     <summary>Provides dependency management and property injection for ASP.NET WebForms Pages.</summary>
     <language>en-US</language>
-    <title>Autofac Web Forms Integration</title>
+    <title>Autofac Web Forms Integration - Container Provider Accessor Override</title>
     <projectUrl>http://autofac.org</projectUrl>
     <iconUrl>http://code.google.com/p/autofac/logo</iconUrl>
     <dependencies>
